@@ -1,8 +1,9 @@
 # Broccoli
 
-<img src="logo/broccoli-logo-small.generated.png" align="right" height="150">
+<img src="logo/broccoli-logo.generated.png" align="right" height="150">
 
-[![Build Status](https://travis-ci.org/broccolijs/broccoli.png?branch=master)](https://travis-ci.org/broccolijs/broccoli)
+[![Build Status](https://travis-ci.org/broccolijs/broccoli.svg?branch=master)](https://travis-ci.org/broccolijs/broccoli)
+[![Build status](https://ci.appveyor.com/api/projects/status/jd3ts93gryjeqclf/branch/master?svg=true)](https://ci.appveyor.com/project/joliss/broccoli/branch/master)
 
 A fast, reliable asset pipeline, supporting constant-time rebuilds and compact
 build definitions. Comparable to the Rails asset pipeline in scope, though it
@@ -14,8 +15,8 @@ For the command line interface, see
 
 **This is 0.x beta software.**
 
-Windows support appears to still be spotty. Reports (on GitHub or IRC) about
-specific failures are much appreciated -- we love collecting stack traces!
+Windows support is still spotty. Our biggest pain point is unreliable file
+deletion (see [rimraf#72](https://github.com/isaacs/rimraf/issues/72)).
 
 ## Installation
 
@@ -24,25 +25,46 @@ npm install --save-dev broccoli
 npm install --global broccoli-cli
 ```
 
-## Getting Started
-
-Check out
-[broccoli-sample-app](https://github.com/broccolijs/broccoli-sample-app).
-
 ## Brocfile.js
 
 A `Brocfile.js` file in the project root contains the build specification. It
-should export a tree which may simply be the directory path (as a string). To
-build more advanced output trees you may want to use some of the plugins listed
-below.
+should export a tree.
 
-The following would export the `app/` subdirectory as a tree:
+A tree can be any string representing a directory path, like `'app'` or
+`'src'`. Or a tree can be an object conforming to the [Plugin API
+Specification](#plugin-api-specification). A `Brocfile.js` will usually
+directly work with only directory paths, and then use the plugins in the
+[Plugins](#plugins) section to generate transformed trees.
+
+The following simple `Brocfile.js` would export the `app/` subdirectory as a
+tree:
 
 ```js
 module.exports = 'app'
 ```
 
-Alternatively, the following would export the `app/` subdirectory as `appkit/`:
+With that Brocfile, the build result would equal the contents of the `app`
+tree in your project folder. For example, say your project contains these
+files:
+
+    app
+    ├─ main.js
+    └─ helper.js
+    Brocfile.js
+    package.json
+    …
+
+Running `broccoli build the-output` (a command provided by
+[broccoli-cli](https://github.com/broccolijs/broccoli-cli)) would generate
+the following folder within your project folder:
+
+    the-output
+    ├─ main.js
+    └─ helper.js
+
+### Using plugins in a `Brocfile.js`
+
+The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
 
 ```js
 var pickFiles = require('broccoli-static-compiler')
@@ -53,9 +75,29 @@ module.exports = pickFiles('app', {
 })
 ```
 
+That example uses the plugin
+[`broccoli-static-compiler`](https://www.npmjs.com/package/broccoli-static-compiler).
+In order for the `require` call to work, you must first put the plugin in
+your `devDependencies` and install it, with
+
+    npm install --save-dev broccoli-static-compiler
+
+With the above `Brocfile.js` and the file tree from the previous example,
+running `broccoli build the-output` would generate the following folder:
+
+    the-output
+    └─ appkit
+       ├─ main.js
+       └─ helper.js
+
+### A larger example
+
+You can see a full-featured `Brocfile.js` in
+[broccoli-sample-app](https://github.com/broccolijs/broccoli-sample-app/blob/master/Brocfile.js).
+
 ## Plugins
 
-You can find plugins under the [broccoli-plugin-keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
+You can find plugins on [broccoliplugins.com](http://broccoliplugins.com) or under the [broccoli-plugin keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 
 ### Running Broccoli, Directly or Through Other Tools
 
@@ -75,10 +117,13 @@ Shared code for writing plugins.
 ## Plugin API Specification
 
 Broccoli defines a single plugin API: a tree. A tree object represents a tree
-(directory hierarchy) of files that can be regenerated on each build.
+(directory hierarchy) of files that will be regenerated on each build.
 
 By convention, plugins will export a function that takes one or more input
-trees, and returns an output tree object.
+trees, and returns an output tree object. Usually your plugin will be
+implemented as a class representing a tree, but it is recommended to make the
+`new` operator optional
+([example](https://github.com/joliss/broccoli-coffee/blob/a55b3a6677f6d9da83334e9c916ae5e57895d1a6/index.js#L8)).
 
 A tree object must supply two methods that will be called by Broccoli:
 
@@ -147,7 +192,7 @@ property on the plugin instance then fall back to using the plugin constructor's
 ## License
 
 Broccoli was originally written by [Jo Liss](http://www.solitr.com/) and is
-licensed under the [MIT license](LICENSE.md).
+licensed under the [MIT license](LICENSE).
 
 The Broccoli logo was created by [Samantha Penner
 (Miric)](http://mirics.deviantart.com/) and is licensed under [CC0

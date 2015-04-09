@@ -1,5 +1,43 @@
 # master
 
+# 0.15.3
+
+* Correctly display multi-line error messages
+
+# 0.15.2
+
+* Add ability to inject live-reload script into error messages
+
+# 0.15.1
+
+* Hide API warnings behind $BROCCOLI_WARN_READ_API env flag
+* Add support for new error API
+* Fail fast if `build` output directory already exists
+
+# 0.15.0
+
+* Print deprecation warnings for plugins only providing old `.read` API
+
+# 0.14.0
+
+* Add support for new [`.rebuild`
+  API](https://github.com/broccolijs/broccoli/blob/master/docs/new-rebuild-api.md),
+  in addition to existing (now deprecated) `.read` API
+
+# 0.13.6
+
+* Throw helpful error when we encounter as-yet unsupported [`.rebuild`-based
+  plugins](https://github.com/broccolijs/broccoli/blob/master/docs/new-rebuild-api.md)
+
+# 0.13.5
+
+* Add missing `var`
+
+# 0.13.4
+
+* More detailed error message when a tree object is invalid
+* Watcher no longer rebuilds forever when a very early build error occurs
+
 # 0.13.3
 
 * Fix SIGINT/SIGTERM (Ctrl+C) handling to avoid leaking tmp files
