@@ -67,20 +67,19 @@ the following folder within your project folder:
 The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
 
 ```js
-var pickFiles = require('broccoli-static-compiler')
+var Funnel = require('broccoli-funnel')
 
-module.exports = pickFiles('app', {
-  srcDir: '/',
+module.exports = new Funnel('app', {
   destDir: 'appkit'
 })
 ```
 
 That example uses the plugin
-[`broccoli-static-compiler`](https://www.npmjs.com/package/broccoli-static-compiler).
+[`broccoli-funnel`](https://www.npmjs.com/package/broccoli-funnel).
 In order for the `require` call to work, you must first put the plugin in
 your `devDependencies` and install it, with
 
-    npm install --save-dev broccoli-static-compiler
+    npm install --save-dev broccoli-funnel
 
 With the above `Brocfile.js` and the file tree from the previous example,
 running `broccoli build the-output` would generate the following folder:
@@ -115,6 +114,10 @@ Shared code for writing plugins.
 * [node-quick-temp](https://github.com/joliss/node-quick-temp)
 
 ## Plugin API Specification
+
+*This section needs to be updated. For now, see
+[docs/broccoli-1-0-plugin-api.md](docs/broccoli-1-0-plugin-api.md) and the
+[broccoli-plugin README](https://github.com/broccolijs/broccoli-plugin).*
 
 Broccoli defines a single plugin API: a tree. A tree object represents a tree
 (directory hierarchy) of files that will be regenerated on each build.
